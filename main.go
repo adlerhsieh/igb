@@ -7,12 +7,25 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"bufio"
+	"fmt"
 )
 
 func main() {
-	code := "puts(123)"
+	codeInput := UserInput()
 
-	Execute(code)
+	Execute(codeInput)
+}
+
+func UserInput() string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter code: ")
+	codeInput, err := reader.ReadString('\n')
+	if err != nil {
+		panic(err)
+	}
+	return codeInput
 }
 
 func Dir() string {
