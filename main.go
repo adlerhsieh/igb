@@ -9,8 +9,22 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
+
+var LineNumber int
+
+func PrintPrompt() {
+	LineNumber = LineNumber + 1
+	l := strconv.Itoa(LineNumber)
+	if LineNumber < 10 {
+		l = "00" + l
+	} else if LineNumber < 100 {
+		l = "0" + l
+	}
+	fmt.Print("igb(", l, ")>")
+}
 
 func main() {
 	LoopInput()
@@ -24,13 +38,17 @@ func LoopInput() {
 		if codeInput == "exit" {
 			break
 		}
-		Execute(codeInput)
+		if codeInput == "" {
+			continue
+		}
+		responseObject := Execute(codeInput)
+		fmt.Println("# =>", responseObject.Inspect())
 	}
 }
 
 func UserInput() string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter code: ")
+	PrintPrompt()
 	codeInput, err := reader.ReadString('\n')
 	if err != nil {
 		panic(err)
@@ -57,7 +75,7 @@ func WriteToTmpFile(codeInput string) {
 	}
 }
 
-func Execute(codeInput string) {
+func Execute(codeInput string) vm.Object {
 	WriteToTmpFile(codeInput)
 
 	codeBytes := []byte(codeInput)
@@ -67,4 +85,5 @@ func Execute(codeInput string) {
 
 	v := vm.New(Dir(), []string{})
 	v.ExecBytecodes(bytecodes, TmpFile())
+	return v.GetExecResult()
 }
