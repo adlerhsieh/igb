@@ -1,21 +1,31 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"github.com/goby-lang/goby/bytecode"
 	"github.com/goby-lang/goby/parser"
 	"github.com/goby-lang/goby/vm"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"bufio"
-	"fmt"
+	"strings"
 )
 
 func main() {
-	codeInput := UserInput()
+	LoopInput()
+	os.Remove(TmpFile())
+	os.Exit(0)
+}
 
-	Execute(codeInput)
+func LoopInput() {
+	for {
+		codeInput := UserInput()
+		if codeInput == "exit" {
+			break
+		}
+		Execute(codeInput)
+	}
 }
 
 func UserInput() string {
@@ -25,7 +35,7 @@ func UserInput() string {
 	if err != nil {
 		panic(err)
 	}
-	return codeInput
+	return strings.TrimSpace(codeInput)
 }
 
 func Dir() string {
